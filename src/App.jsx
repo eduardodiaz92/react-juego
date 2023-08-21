@@ -60,6 +60,15 @@ function App() {
     setWinner(null);
   };
 
+  const checkEndGame = (newBoard) => {
+    // revisamos si hay un empate
+    // si no hay más espacios vacíios
+    // en el tablero
+    // si todas las posicones (square) del array newBoard tienen que el square es
+    // diferente a null hay empate
+    return newBoard.every((square) => square !== null);
+  };
+
   const updateBoard = (index) => {
     /* no actaulizamos esta posicions
   si ya tiene algo */
@@ -81,6 +90,8 @@ function App() {
       // la actualizacion de los estado en react son asincronos, no bloquea
       // la ejecucion del codigo que viene despues
       setWinner(newWinner);
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false); // empate
     }
   };
 
