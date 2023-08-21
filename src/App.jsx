@@ -53,28 +53,41 @@ function App() {
     // si no hay ganador
     return null;
   };
+  // se regresa la tabla con el valor inicial
+  const resetGame = () => {
+    setBoard(Array(9).fill(null));
+    setTurn(TURNS.X);
+    setWinner(null);
+  };
 
   const updateBoard = (index) => {
     /* no actaulizamos esta posicions
   si ya tiene algo */
     if (board[index] || winner) return;
-    // actualizar el tablero
+    // actualizar el tablero, la copia del board se hace porque no tienes que mutar nunca
+    // las props ni el estado. tienen que ser inmutables
     const newBoard = [...board];
+    // el nuevo board como recive el indice, le daremos el valor del turno actual
     newBoard[index] = turn;
+    // para actualizar el tablero usamos el setBoard con el nuevo board
     setBoard(newBoard);
     // cambiar elturno
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
+    // es importante que los datos de renderizado siempre sean nuevos
     setTurn(newTurn);
     // revisar si hay ganador
     const newWinner = checkWinner(newBoard);
     if (newWinner) {
+      // la actualizacion de los estado en react son asincronos, no bloquea
+      // la ejecucion del codigo que viene despues
       setWinner(newWinner);
     }
   };
 
   return (
     <main className="board">
-      <h1>Tic tac toe</h1>
+      <h1>Gato</h1>
+      <button onClick={resetGame}>Reset del juego</button>
       <section className="game">
         {board.map((_, index) => {
           return (
@@ -88,6 +101,20 @@ function App() {
         <Square isSelected={turn === TURNS.X}>{TURNS.X}</Square>
         <Square isSelected={turn === TURNS.O}>{TURNS.O}</Square>
       </section>
+
+      {winner !== null && (
+        <section className="winner">
+          <div className="text">
+            <h2>{winner === false ? "Empate" : "Ganó:"}</h2>
+            <header className="win">
+              {winner && <Square>{winner}</Square>}
+            </header>
+            <footer>
+              <button onClick={resetGame}>Empezar de nuevo</button>
+            </footer>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
