@@ -7,8 +7,21 @@ import { checkWinner, checkEndGame } from "./logic/board";
 import { WinnerModal } from "./components/WinnerModal";
 
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [turn, setTurn] = useState(TURNS.X);
+  // la forma correcta de leer el localStorage e inicializar el estado dependiendo si
+  // tenemos localStorage, en lugar de pasarle directamente el valor lle pasamos una funcion
+  // recuperando el board del localStorage
+  const [board, setBoard] = useState(() => {
+    const boardFromStorage = window.localStorage.getItem("board");
+    if (boardFromStorage) return JSON.parse(boardFromStorage);
+    return Array(9).fill(null);
+  });
+
+  const [turn, setTurn] = useState(() => {
+    const turnFromStorage = window.localStorage.getItem("turn");
+    // esto mira su es undefined
+    return turnFromStorage ?? TURNS.X;
+  });
+
   // null es que no hay ganador, false es que hay un empate
   const [winner, setWinner] = useState(null);
 
@@ -17,6 +30,9 @@ function App() {
     setBoard(Array(9).fill(null));
     setTurn(TURNS.X);
     setWinner(null);
+
+    window.localStorage.removeItem("board");
+    window.localStorage.removeItem("turn");
   };
 
   const updateBoard = (index) => {
@@ -34,6 +50,11 @@ function App() {
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
     // es importante que los datos de renderizado siempre sean nuevos
     setTurn(newTurn);
+    // guardar aqui partida, localStorage puede guardar es un string
+    // usando stringify guardamos el array en un string y luego lo
+    // volvemos a transformars
+    window.localStorage.setItem("board", JSON.stringify(newBoard));
+    window.localStorage.setItem("turn", newTurn);
     // revisar si hay ganador
     const newWinner = checkWinner(newBoard);
     if (newWinner) {
